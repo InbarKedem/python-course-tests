@@ -63,6 +63,18 @@ class TestPolynomial(unittest.TestCase):
         self.assertEqual(result.coefficients, [6],
                          "Adding p1 + p2 should yield the constant polynomial [6].")
 
+        # p9 = 2x^3 - 2x^2 + 5 => [2, -2, 0, 5]
+        p9 = Polynomial([2, -2, 0, 5])
+        # p10 = 2x^3 - 2x^2 - 5 => [2, -2, 0, -5]
+        p10 = Polynomial([2, -2, 0, -5])
+        # p9 + p10 => (2+2)x^3 + (-2-2)x^2 + (5-5) => 4x^3 + -4x^2 + 0
+        # which should simplify to [4, -4, 0, 0], i.e. 4x^3 - 4x^2
+        sum_9_10 = p9 + p10
+        self.assertEqual(
+            sum_9_10.coefficients, [4, -4, 0, 0],
+            "Expected 4x^3 - 4x^2 after adding p9 and p10."
+        )
+
     def test_sub(self):
         p1 = Polynomial([1, 2, 3])  # x^2 + 2x + 3
         p2 = Polynomial([1, 2, 0])  # x^2 + 2
@@ -87,6 +99,18 @@ class TestPolynomial(unittest.TestCase):
         result = p3 - p4
         self.assertEqual(result.coefficients, [0],
                          "Subtracting identical polynomials should yield [0].")
+
+        # p11 = 5x^3 - x + 2 => [5, 0, -1, 2]
+        p11 = Polynomial([5, 0, -1, 2])
+        # p12 = 2x^3 - x + 7 => [2, 0, -1, 7]
+        p12 = Polynomial([2, 0, -1, 7])
+        # p11 - p12 => (5-2)x^3 + (0-0)x^2 + (-1 - -1)x + (2 - 7)
+        #           => 3x^3 + 0x^2 + 0x - 5 => [3, 0, 0, -5]
+        diff_11_12 = p11 - p12
+        self.assertEqual(
+            diff_11_12.coefficients, [3, 0, 0, -5],
+            "Expected 3x^3 - 5 after subtracting p12 from p11."
+        )
 
     def test_mul(self):
         """
@@ -156,6 +180,21 @@ class TestPolynomial(unittest.TestCase):
         # If polynomials are identical, p1 > p1 => False
         self.assertFalse(p1 > p1, "A polynomial should not be greater than itself.")
 
+        # Now compare polynomials with same degree but different leading coefficients:
+        # p17 = 2x^3 + 1 => [2, 0, 0, 1]
+        p17 = Polynomial([2, 0, 0, 1])
+        # p18 = -3x^3 + 10 => [-3, 0, 0, 10]
+        p18 = Polynomial([-3, 0, 0, 10])
+        # Both are degree 3, but leading coefficients differ: 2 vs -3 => p17 > p18
+        self.assertTrue(
+            p17.__gt__(p18),
+            "p17 should be greater because 2 (leading coeff) > -3 for the same degree."
+        )
+        self.assertFalse(
+            p18.__gt__(p17),
+            "p18 is not greater than p17 because -3 < 2 at the leading term."
+        )
+
     def test_verify_zero(self):
         """
         Test the verify_zero function directly via the constructor
@@ -173,42 +212,6 @@ class TestPolynomial(unittest.TestCase):
         self.assertEqual(p2.coefficients, [0],
                          "All-zero polynomial should become [0].")
         # self.assertEqual(str(p2), "0")
-
-
-# def test_hotel():
-#     m1 = Minibar({'Coke': 10, 'Lemonade': 1}, {'Bamba': 8, 'Mars': 12})
-#     m2 = Minibar({'Beer': 10, 'Lemonade': 4}, {'m&m': 6})
-#     rooms = [Room(m2, 514, [], 5, True),
-#              Room(m2, 210, ["Ronen", "Shir"], 6, True),
-#              Room(m1, 102, ["Liat"], 7, False),
-#              Room(m2, 223, [], 6, True)]
-#     h = Hotel("Dan", rooms)
-#     test_sep = '\n------------------'
-#     print('PRINT m1:\n', m1, test_sep, sep="")
-#     print('PRINT m2:\n', m2, test_sep, sep="")
-#     print('PRINT h:\n', h, test_sep, sep="")
-#     liat_room = h.send_cleaner('Liat')
-#     print('CALL: h.send_cleaner("Liat")\n', liat_room, test_sep, sep="")
-#     print('CALL: liat_room.eat("bamba")\n', liat_room.minibar.eat("bamba"), test_sep, sep="")
-#     print('PRINT liat_room.minibar:\n', liat_room.minibar, test_sep, sep="")
-#     print('CALL: liat_room.drink("lemonade")\n', liat_room.minibar.drink("lemonade"), test_sep, sep="")
-#     print('PRINT liat_room.minibar:\n', liat_room.minibar, test_sep, sep="")
-#     print('CALL: h.upgrade("Liat")\n', h.upgrade("Liat"), test_sep, sep="")
-#
-#     print('CALL: h.check_out("Ronen")\n', h.check_out("Ronen"), test_sep, sep="")
-#     print('CALL: h.check_out("Ronen")\n', h.check_out("Ronen"), test_sep, sep="")
-#     print('CALL: h.check_in(["Alice", "Wonder"], True)\n',
-#           h.check_in(["Alice", "Wonder"], True), test_sep, sep="")
-#     print('CALL: h.check_in(["Alex"], True)\n', h.check_in(["Alex"], True), test_sep,
-#           sep="")
-#     print('PRINT h:\n', h, test_sep, sep="")
-#     print('CALL: h.check_in(["Oded", "Shani"], False)\n',
-#           h.check_in(["Oded", "Shani"], False), test_sep, sep="")
-#     print('CALL: h.check_in(["Oded", "Shani"], False)\n',
-#           h.check_in(["Oded", "Shani"], False), test_sep, sep="")
-#     print('CALL: h.check_out("Liat")\n', h.check_out("Liat"), test_sep, sep="")
-#     print('CALL: h.check_out("Liat")\n', h.check_out("Liat"), test_sep, sep="")
-#     print('PRINT h:\n', h, test_sep, sep="")
 
 
 if __name__ == "__main__":
